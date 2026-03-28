@@ -1,0 +1,72 @@
+name: Deploy Alpha Beta Tracker
+
+# 1. This tells GitHub to run this script ONLY when you push to the 'main' branch
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # 2. Deploy the Python Backend to AWS Lambda
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1 # CHANGE THIS if your AWS region is different (e.g., us-east-2)
+
+      - name: Setup AWS SAM CLI
+        uses: aws-actions/setup-sam@v2
+
+      - name: Build and Deploy SAM Application
+        working-directory: ./backend
+        # This auto-deploys without asking for 'Y/N' confirmations
+        run: |
+          sam build
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name alpha-beta-stack --resolve-s3 --capabilities CAPABILITY_IAM
+
+  # 3. Deploy the React Frontend to S3 and refresh CloudFront
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    needs: deploy-backend # This ensures the backend finishes deploying before the frontend starts
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1 # CHANGE THIS if your AWS region is different
+
+      - name: Install dependencies and Build React App
+        working-directory: ./frontend
+        run: |
+          npm install
+          npm run build
+
+      - name: Sync built files to S3 bucket
+        working-directory: ./frontend
+        # This deletes old files and uploads the new compiled React code
+        run: aws s3 sync ./dist s3://${{ secrets.AWS_S3_BUCKET }} --delete
+
+      - name: Invalidate CloudFront Cache
+        # This forces the global CDN to clear its cache and show users your newest code instantly
+        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_ID }} --paths "/*"
