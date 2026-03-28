@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  AlphaBetaTracker
+  SAM Template for Live Market Alpha & Beta Tracker
+
+Globals:
+  Function:
+    Timeout: 15
+    MemorySize: 3008    # <-- Let's give it the max standard power
+    Runtime: python3.12
+
+Resources:
+  AlphaBetaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Architectures:
+        - arm64    # <-- Change this from x86_64
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref AlphaBetaTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AlphaBetaTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /metrics
+            Method: get
+
+  AlphaBetaTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: AlphaBetaCache
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/metrics/"

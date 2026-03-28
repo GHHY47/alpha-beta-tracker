@@ -1,0 +1,15 @@
+# Node
+node_modules/
+frontend/dist/
+
+# Python / SAM
+.aws-sam/
+__pycache__/
+*.pyc
+.venv/
+
+# OS
+.DS_Store
+
+# Secrets (Never commit these!)
+.env
