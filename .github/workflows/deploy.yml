@@ -42,12 +42,12 @@ jobs:
     needs: deploy-backend # This ensures the backend finishes deploying before the frontend starts
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4   # <-- Upgraded to v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4 # <-- Upgraded to v4
         with:
-          node-version: '18'
+          node-version: '20'        # <-- CHANGED FROM '18' TO '20'
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
