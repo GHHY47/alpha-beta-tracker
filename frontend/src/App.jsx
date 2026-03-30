@@ -310,7 +310,7 @@ function App() {
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Observation Date & Time</p>
                   <input type="date" value={activeData.date} onChange={handleDateInput} min={data.history[0].date} max={mostRecentData.date} className={`text-lg font-black bg-transparent border-b border-dashed focus:outline-none focus:border-blue-500 pb-0.5 cursor-pointer w-40 ${isLockedView ? 'text-blue-700 border-blue-300' : 'text-slate-800 border-slate-300'}`} />
                   <p className="text-[10px] text-slate-500 mt-1">{getYearBack(activeData.date)} → {activeData.date}</p>
-                  <p className={`text-[9px] font-bold mt-1 uppercase ${lockedData ? 'text-red-500' : 'text-slate-400'}`}>{lockedData ? '🔒 CLICK CHART TO UNLOCK' : 'DOUBLE CLICK CHART TO LOCK'}</p>
+                  <p className={`text-[9px] font-bold mt-1 uppercase ${lockedData ? 'text-red-500' : 'text-slate-400'}`}>{lockedData ? '🔒 DOUBLE CLICK CHART TO UNLOCK' : 'CLICK CHART TO LOCK'}</p>
                 </div>
                 
                 <div className="bg-white p-2.5 rounded shadow-sm border border-slate-100 flex flex-col justify-between">
