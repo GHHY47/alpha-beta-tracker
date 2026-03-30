@@ -5,6 +5,13 @@ Description: >
   SAM Template for Live Market Alpha & Beta Tracker
 
 Globals:
+  # --- ADDED THIS API BLOCK FOR CORS ---
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,OPTIONS'"
+      AllowHeaders: "'content-type'"
+      AllowOrigin: "'*'" # This tells AWS to accept requests from your React app
+  # -------------------------------------
   Function:
     Timeout: 15
     MemorySize: 3008    # <-- Let's give it the max standard power
