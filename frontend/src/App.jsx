@@ -26,10 +26,10 @@ function App() {
       // --- CHOOSE YOUR ENVIRONMENT HERE ---
       
       // 1. Local Testing URL (Keep this commented out for now)
-      const API_URL = `http://127.0.0.1:3000/metrics?ticker=${ticker}&period=${period}`
+      // const API_URL = `http://127.0.0.1:3000/metrics?ticker=${ticker}&period=${period}`
 
       // 2. Live AWS Production URL (Use this for GitHub/Live Website)
-      // const API_URL = `https://1sgf7bhu58.execute-api.us-east-2.amazonaws.com/Prod/metrics?ticker=${ticker}&period=${period}`
+      const API_URL = `https://1sgf7bhu58.execute-api.us-east-2.amazonaws.com/Prod/metrics?ticker=${ticker}&period=${period}`
       const response = await fetch(API_URL)
       
       if (!response.ok) throw new Error("Failed to fetch data.")
