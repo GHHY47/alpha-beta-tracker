@@ -1,3 +1,4 @@
+# file path: backend/src/requirements.txt
 yfinance
 pandas
 numpy

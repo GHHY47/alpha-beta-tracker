@@ -1,3 +1,4 @@
+# file path: backend/src/samconfig.toml
 version = 0.1
 
 [default.deploy.parameters]

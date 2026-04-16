@@ -1,3 +1,4 @@
+# file path: backend/src/app.py
 import json
 import os
 import boto3                  # AWS SDK for Python (lets us talk to DynamoDB)
