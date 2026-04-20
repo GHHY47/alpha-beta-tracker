@@ -72,7 +72,8 @@ export default function ChatInterface({ activeData, globalData, onClose }) {
       // const API_URL = 'http://127.0.0.1:3000/chat'; 
 
       // USE YOUR LIVE AWS URL HERE!
-      const API_URL = 'https://1sgf7bhu58.execute-api.us-east-2.amazonaws.com/Prod/chat';
+      // Change 1sgf7bhu58 -> 1idd4spcc5
+      const API_URL = 'https://1idd4spcc5.execute-api.us-east-2.amazonaws.com/Prod/chat';
       
       // THE PAYLOAD: We package the user's message alongside the heavy financial data.
       // This is the "secret sauce" that gives Gemini its context.
