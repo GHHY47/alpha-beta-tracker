@@ -6,16 +6,14 @@ Description: >
   SAM Template for Live Market Alpha & Beta Tracker
 
 Globals:
-  # --- ADDED THIS API BLOCK FOR CORS ---
   Api:
     Cors:
       AllowMethods: "'GET,POST,OPTIONS'"
       AllowHeaders: "'content-type'"
-      AllowOrigin: "'*'" # This tells AWS to accept requests from your React app
-  # -------------------------------------
+      AllowOrigin: "'*'"
   Function:
-    Timeout: 60         # <-- CHANGE THIS FROM 15 TO 60
-    MemorySize: 3008    # <-- Let's give it the max standard power
+    Timeout: 60
+    MemorySize: 3008
     Runtime: python3.12
 
 Resources:
@@ -25,7 +23,7 @@ Resources:
       CodeUri: src/
       Handler: app.lambda_handler
       Architectures:
-        - arm64    # <-- Change this from x86_64
+        - arm64
       Environment:
         Variables:
           DYNAMODB_TABLE: !Ref AlphaBetaTable
@@ -39,7 +37,7 @@ Resources:
             Path: /metrics
             Method: get
 
-ChatFunction:
+  ChatFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
@@ -48,10 +46,10 @@ ChatFunction:
         - arm64
       Environment:
         Variables:
-          GEMINI_API_KEY: "" 
-          DYNAMODB_TABLE: !Ref AlphaBetaTable # <--- Give it the DB name
+          GEMINI_API_KEY: ""
+          DYNAMODB_TABLE: !Ref AlphaBetaTable
       Policies:
-        - DynamoDBCrudPolicy:                 # <--- Give it permission to read/write the DB
+        - DynamoDBCrudPolicy:
             TableName: !Ref AlphaBetaTable
       Events:
         ApiEvent:
@@ -63,7 +61,6 @@ ChatFunction:
   AlphaBetaTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      # TableName: AlphaBetaCache
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: id
@@ -76,8 +73,8 @@ ChatFunction:
         Enabled: true
 
 Outputs:
-  ApiUrl:
-    Description: "API Gateway endpoint URL"
+  MetricsApiUrl:
+    Description: "API Gateway endpoint URL for Metrics"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/metrics/"
   ChatApiUrl:
     Description: "API Gateway endpoint URL for Chat"
