@@ -1,17 +1,37 @@
 /*
  * file path: frontend/src/components/SearchForm.jsx
  */
-export default function SearchForm({ ticker, setTicker, period, setPeriod, loading, fetchMetrics }) {
+export default function SearchForm({ 
+  ticker, setTicker, 
+  period, setPeriod, 
+  loading, fetchMetrics,
+  isChatOpen, setIsChatOpen, hasData 
+}) {
   return (
-    <div className="flex-none pb-4 border-b border-slate-100 flex justify-between items-center">
-      <div>
+    <div className="flex-none pb-4 border-b border-slate-100 flex justify-between items-center gap-4">
+      
+      {/* LEFT: Branding */}
+      <div className="flex-none">
         <h1 className="text-xl font-black text-slate-800 tracking-tight">
           He Yan <span className="text-blue-600">Portfolio</span>
         </h1>
         <p className="text-xs text-slate-500 font-medium">Alpha & Beta Matrix Demo</p>
       </div>
 
-      <form onSubmit={fetchMetrics} className="flex gap-2">
+      {/* MIDDLE: Conditionally rendered AI Button */}
+      <div className="flex-1 flex justify-center">
+        {hasData && !isChatOpen && (
+          <button
+            onClick={() => setIsChatOpen(true)}
+            className="bg-slate-800 text-white px-5 py-1.5 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-slate-700 hover:scale-105 transition-all border border-slate-600 shadow-sm"
+          >
+            ✨ Ask AI Analyst
+          </button>
+        )}
+      </div>
+
+      {/* RIGHT: Search Form */}
+      <form onSubmit={fetchMetrics} className="flex-none flex gap-2">
         <input
           type="text"
           value={ticker}
@@ -46,6 +66,7 @@ export default function SearchForm({ ticker, setTicker, period, setPeriod, loadi
           )}
         </button>
       </form>
+      
     </div>
   )
 }

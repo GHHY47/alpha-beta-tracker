@@ -39,6 +39,27 @@ Resources:
             Path: /metrics
             Method: get
 
+ChatFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: chat.lambda_handler
+      Architectures:
+        - arm64
+      Environment:
+        Variables:
+          GEMINI_API_KEY: "" 
+          DYNAMODB_TABLE: !Ref AlphaBetaTable # <--- Give it the DB name
+      Policies:
+        - DynamoDBCrudPolicy:                 # <--- Give it permission to read/write the DB
+            TableName: !Ref AlphaBetaTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /chat
+            Method: post
+
   AlphaBetaTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -58,3 +79,6 @@ Outputs:
   ApiUrl:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/metrics/"
+  ChatApiUrl:
+    Description: "API Gateway endpoint URL for Chat"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/chat"
