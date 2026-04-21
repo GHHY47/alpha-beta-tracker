@@ -25,7 +25,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1 # CHANGE THIS if your AWS region is different (e.g., us-east-2)
+          aws-region: us-east-2 # CHANGE THIS if your AWS region is different
 
       - name: Setup AWS SAM CLI
         uses: aws-actions/setup-sam@v2
@@ -35,7 +35,11 @@ jobs:
         # This auto-deploys without asking for 'Y/N' confirmations
         run: |
           sam build
-          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name alpha-beta-stack --resolve-s3 --capabilities CAPABILITY_IAM
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset \
+            --stack-name alpha-beta-stack \
+            --resolve-s3 \
+            --region us-east-2 \
+            --capabilities CAPABILITY_IAM
 
   # 3. Deploy the React Frontend to S3 and refresh CloudFront
   deploy-frontend:
@@ -55,13 +59,17 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1 # CHANGE THIS if your AWS region is different
+          aws-region: us-east-2 # CHANGE THIS if your AWS region is different
 
       - name: Install dependencies and Build React App
         working-directory: ./frontend
+        # PRO TIP: We pass the API URL as an environment variable during build
+        # This allows you to use 'import.meta.env.VITE_API_URL' in your code!
         run: |
           npm install
           npm run build
+        env:
+          VITE_API_URL: "https://1idd4spcc5.execute-api.us-east-2.amazonaws.com/Prod"
 
       - name: Sync built files to S3 bucket
         working-directory: ./frontend
