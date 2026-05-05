@@ -15,3 +15,7 @@ __pycache__/
 # Secrets (Never commit these!)
 .env
 env.json
+
+# text for LLM prompts
+project_context.txt
+run.sh

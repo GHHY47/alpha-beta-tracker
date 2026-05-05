@@ -1,9 +1,7 @@
 # file path: backend/template.yaml
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: >
-  AlphaBetaTracker
-  SAM Template for Live Market Alpha & Beta Tracker
+Description: AlphaBetaTracker SAM Template
 
 Globals:
   Api:
@@ -14,16 +12,16 @@ Globals:
   Function:
     Timeout: 60
     MemorySize: 3008
-    Runtime: python3.12
 
 Resources:
+  # Python Backend
   AlphaBetaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
       Handler: app.lambda_handler
-      Architectures:
-        - arm64
+      Runtime: python3.12
+      Architectures: [arm64]
       Environment:
         Variables:
           DYNAMODB_TABLE: !Ref AlphaBetaTable
@@ -42,11 +40,11 @@ Resources:
     Properties:
       CodeUri: src/
       Handler: chat.lambda_handler
-      Architectures:
-        - arm64
+      Runtime: python3.12
+      Architectures: [arm64]
       Environment:
         Variables:
-          GEMINI_API_KEY: ""
+          GEMINI_API_KEY: "" # Set this in AWS Console secrets later
           DYNAMODB_TABLE: !Ref AlphaBetaTable
       Policies:
         - DynamoDBCrudPolicy:
@@ -72,10 +70,84 @@ Resources:
         AttributeName: ttl
         Enabled: true
 
+  # ==========================================
+  # GO INFRASTRUCTURE
+  # ==========================================
+  ProcessingQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: alphabeta-processing-queue
+      VisibilityTimeout: 900 
+
+  GoProducerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/producer/
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Architectures: [arm64]
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt ProcessingQueue.QueueName
+      Events:
+        DailyTrigger:
+          Type: ScheduleV2
+          Properties:
+            # Runs Mon-Fri at 4:15 PM EST (21:15 UTC)
+            ScheduleExpression: "cron(15 21 ? * MON-FRI *)"
+    Metadata:
+      BuildMethod: go
+
+  GoWorkerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/worker/
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Architectures: [arm64]
+      Timeout: 900
+      Environment:
+        Variables:
+          DB_HOST: "alphabeta-db.c9o4cmack332.us-east-2.rds.amazonaws.com"
+          DB_USER: "postgres"
+          DB_PASS: "localpassword"
+          DB_NAME: "alphabeta"
+          TWELVE_DATA_API_KEY: "0854987a076c4fdab6f99bc6311c2eee"
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt ProcessingQueue.QueueName
+      Events:
+        SQSQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt ProcessingQueue.Arn
+            BatchSize: 1 
+    Metadata:
+      BuildMethod: go
+
+  GoApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/api/
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Architectures: [arm64]
+      Environment:
+        Variables:
+          DB_HOST: "alphabeta-db.c9o4cmack332.us-east-2.rds.amazonaws.com"
+          DB_USER: "postgres"
+          DB_PASS: "localpassword"
+          DB_NAME: "alphabeta"
+      Events:
+        RankingsApi:
+          Type: Api
+          Properties:
+            Path: /rankings
+            Method: get
+    Metadata:
+      BuildMethod: go
+
 Outputs:
-  MetricsApiUrl:
-    Description: "API Gateway endpoint URL for Metrics"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/metrics/"
-  ChatApiUrl:
-    Description: "API Gateway endpoint URL for Chat"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/chat"
+  RankingsApiUrl:
+    Description: "API Gateway endpoint URL for Rankings (Go)"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/rankings/"
