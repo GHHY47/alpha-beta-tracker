@@ -58,7 +58,6 @@ Resources:
 
   AlphaBetaTable:
     Type: AWS::DynamoDB::Table
-  
     Properties:
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
@@ -83,7 +82,7 @@ Resources:
   GoProducerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: . # <--- CHANGE THIS to a single dot
+      CodeUri: .
       Handler: bootstrap
       Runtime: provided.al2023
       Architectures: [arm64]
@@ -96,12 +95,12 @@ Resources:
           Properties:
             ScheduleExpression: "cron(15 21 ? * MON-FRI *)"
     Metadata:
-      BuildMethod: makefile # <--- ADD THIS
+      BuildMethod: makefile
 
   GoWorkerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: . # <--- CHANGE THIS to a single dot
+      CodeUri: .
       Handler: bootstrap
       Runtime: provided.al2023
       Architectures: [arm64]
@@ -123,35 +122,33 @@ Resources:
             Queue: !GetAtt ProcessingQueue.Arn
             BatchSize: 1
     Metadata:
-      BuildMethod: makefile # <--- ADD THIS
+      BuildMethod: makefile
 
-    GoApiFunction:
-      Type: AWS::Serverless::Function
-      Properties:
-        CodeUri: . 
-        Handler: bootstrap
-        Runtime: provided.al2023
-        Architectures: [arm64]
-        Environment:
-          Variables:
-            DB_HOST: "alphabeta-db.c9o4cmack332.us-east-2.rds.amazonaws.com"
-            DB_USER: "postgres"
-            DB_PASS: "{{resolve:ssm:/alphabeta/db-password}}"
-            DB_NAME: "alphabeta"
-            # Add the Queue URL reference here:
-            SQS_QUEUE_URL: !Ref ProcessingQueue
-        # Add the permission policy here:
-        Policies:
-          - SQSSendMessagePolicy:
-              QueueName: !GetAtt ProcessingQueue.QueueName
-        Events:
-          RankingsApi:
-            Type: Api
-            Properties:
-              Path: /rankings
-              Method: get
-      Metadata:
-        BuildMethod: makefile
+  GoApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: . 
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Architectures: [arm64]
+      Environment:
+        Variables:
+          DB_HOST: "alphabeta-db.c9o4cmack332.us-east-2.rds.amazonaws.com"
+          DB_USER: "postgres"
+          DB_PASS: "{{resolve:ssm:/alphabeta/db-password}}"
+          DB_NAME: "alphabeta"
+          SQS_QUEUE_URL: !Ref ProcessingQueue
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt ProcessingQueue.QueueName
+      Events:
+        RankingsApi:
+          Type: Api
+          Properties:
+            Path: /rankings
+            Method: get
+    Metadata:
+      BuildMethod: makefile 
 
 Outputs:
   RankingsApiUrl:
