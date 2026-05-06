@@ -45,7 +45,7 @@ func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 		}
 		
 		fmt.Printf("✅ %s saved. Cooling down 8s...\n", ticker)
-		time.Sleep(8 * time.Second)
+		time.Sleep(16 * time.Second) // <--- Change 8 to 16
 	}
 	return nil
 }

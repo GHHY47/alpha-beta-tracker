@@ -105,7 +105,6 @@ Resources:
       Runtime: provided.al2023
       Architectures: [arm64]
       Timeout: 900
-      ReservedConcurrentExecutions: 1 # <--- ADD THIS LINE to prevent rate limit slaughter
       Environment:
         Variables:
           DB_HOST: "alphabeta-db.c9o4cmack332.us-east-2.rds.amazonaws.com"
@@ -122,6 +121,8 @@ Resources:
           Properties:
             Queue: !GetAtt ProcessingQueue.Arn
             BatchSize: 1
+            ScalingConfig:
+              MaximumConcurrency: 2
     Metadata:
       BuildMethod: makefile
 
