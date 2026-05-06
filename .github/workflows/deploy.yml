@@ -19,7 +19,7 @@ jobs:
           python-version: '3.10'
 
       # ==========================================
-      # NEW STEP: Install Go so SAM can build it
+      # THIS IS THE MISSING STEP:
       # ==========================================
       - name: Set up Go
         uses: actions/setup-go@v4
