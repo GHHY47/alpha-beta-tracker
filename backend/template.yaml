@@ -77,7 +77,7 @@ Resources:
     Type: AWS::SQS::Queue
     Properties:
       QueueName: alphabeta-processing-queue
-      VisibilityTimeout: 900 
+      VisibilityTimeout: 900
 
   GoProducerFunction:
     Type: AWS::Serverless::Function
@@ -106,14 +106,14 @@ Resources:
       Runtime: provided.al2023
       Architectures: [arm64]
       Timeout: 900
-    Environment:
-      Variables:
-        DB_HOST: "alphabeta-db.c9o4cmack332.us-east-2.rds.amazonaws.com"
-        DB_USER: "postgres"
-        DB_PASS: "{{resolve:ssm-secure:/alphabeta/db-password}}"
-        DB_NAME: "alphabeta"
-        TWELVE_DATA_API_KEY: "{{resolve:ssm-secure:/alphabeta/twelve-data-api-key}}"  # only on GoWorkerFunction
-          Policies:
+      Environment:
+        Variables:
+          DB_HOST: "alphabeta-db.c9o4cmack332.us-east-2.rds.amazonaws.com"
+          DB_USER: "postgres"
+          DB_PASS: "{{resolve:ssm:/alphabeta/db-password}}"
+          DB_NAME: "alphabeta"
+          TWELVE_DATA_API_KEY: "{{resolve:ssm:/alphabeta/twelve-data-api-key}}"
+      Policies:
         - SQSPollerPolicy:
             QueueName: !GetAtt ProcessingQueue.QueueName
       Events:
@@ -121,7 +121,7 @@ Resources:
           Type: SQS
           Properties:
             Queue: !GetAtt ProcessingQueue.Arn
-            BatchSize: 1 
+            BatchSize: 1
     Metadata:
       BuildMethod: go1.x
 
@@ -136,7 +136,7 @@ Resources:
         Variables:
           DB_HOST: "alphabeta-db.c9o4cmack332.us-east-2.rds.amazonaws.com"
           DB_USER: "postgres"
-          DB_PASS: "localpassword"
+          DB_PASS: "{{resolve:ssm:/alphabeta/db-password}}"
           DB_NAME: "alphabeta"
       Events:
         RankingsApi:
