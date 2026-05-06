@@ -18,12 +18,14 @@ import (
 var db *sql.DB
 
 func init() {
-	connStr := fmt.Sprintf("host=%s port=5432 user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_HOST"), os.Getenv("DB_USER"), os.Getenv("DB_PASS"), os.Getenv("DB_NAME"))
-	var err error
-	db, err = sql.Open("postgres", connStr)
-	if err != nil {
-		log.Fatal("❌ ERROR connecting to DB:", err)
-	}
+    connStr := fmt.Sprintf("host=%s port=5432 user=%s password=%s dbname=%s sslmode=require", 
+        os.Getenv("DB_HOST"), os.Getenv("DB_USER"), os.Getenv("DB_PASS"), os.Getenv("DB_NAME"))
+    
+    var err error
+    db, err = sql.Open("postgres", connStr)
+    if err != nil {
+        log.Fatal("❌ DB INIT ERROR:", err)
+    }
 }
 
 func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
@@ -45,7 +47,7 @@ func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 		}
 		
 		fmt.Printf("✅ %s saved. Cooling down 8s...\n", ticker)
-		time.Sleep(24 * time.Second)
+		time.Sleep(25 * time.Second)
 	}
 	return nil
 }

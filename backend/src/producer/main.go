@@ -10,7 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 )
 
-var TICKERS = []string{"NVDA", "AAPL", "MSFT", "AMZN", "GOOGL", "GOOG", "AVGO", "META", "TSLA", "BRK.B", "WMT", "JPM", "LLY", "XOM", "V", "MU", "JNJ", "AMD", "ORCL", "MA", "COST", "INTC", "NFLX", "CAT", "CVX", "BAC", "ABBV", "PG", "CSCO", "KO", "PLTR", "UNH", "HD", "LRCX", "AMAT", "GE", "MS", "GEV", "GS", "MRK", "PM", "WFC", "TXN", "KLAC", "LIN", "RTX", "C", "IBM", "AXP", "PEP"}
+var TICKERS = []string{"NVDA", "AAPL", "MSFT", "AMZN", "GOOGL", "AVGO", "META", "TSLA", "BRK.B", "WMT"}
 
 func handler(ctx context.Context) error {
 	cfg, _ := config.LoadDefaultConfig(ctx, config.WithRegion("us-east-2"))
