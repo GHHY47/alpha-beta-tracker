@@ -32,12 +32,15 @@ type Ranking struct {
 }
 
 func init() {
-	connStr := fmt.Sprintf("host=%s port=5432 user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_HOST"), os.Getenv("DB_USER"), os.Getenv("DB_PASS"), os.Getenv("DB_NAME"))
-	var err error
-	db, err = sql.Open("postgres", connStr)
-	if err != nil {
-		log.Fatal(err)
-	}
+    // Change sslmode=disable to sslmode=require
+    connStr := fmt.Sprintf("host=%s port=5432 user=%s password=%s dbname=%s sslmode=require", 
+        os.Getenv("DB_HOST"), os.Getenv("DB_USER"), os.Getenv("DB_PASS"), os.Getenv("DB_NAME"))
+    
+    var err error
+    db, err = sql.Open("postgres", connStr)
+    if err != nil {
+        log.Fatal(err)
+    }
 }
 
 func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -47,6 +50,8 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
     // Execute the query
     rows, err := db.QueryContext(ctx, q)
 	if err != nil {
+        // ADD THIS LINE BELOW:
+        fmt.Println("❌ DATABASE QUERY ERROR:", err)
 		return events.APIGatewayProxyResponse{StatusCode: 500, Headers: h, Body: `{"error": "DB Fail"}`}, nil
 	}
 	defer rows.Close()
