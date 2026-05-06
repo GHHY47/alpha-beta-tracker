@@ -33,13 +33,6 @@ jobs:
       - name: Setup AWS SAM CLI
         uses: aws-actions/setup-sam@v2
 
-      - name: Build Go binaries
-        working-directory: ./backend
-        run: |
-          GOOS=linux GOARCH=arm64 go build -tags lambda.norpc -o src/producer/bootstrap ./src/producer
-          GOOS=linux GOARCH=arm64 go build -tags lambda.norpc -o src/worker/bootstrap ./src/worker
-          GOOS=linux GOARCH=arm64 go build -tags lambda.norpc -o src/api/bootstrap ./src/api
-
       - name: Build and Deploy SAM Application
         working-directory: ./backend
         run: |

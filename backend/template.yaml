@@ -83,7 +83,7 @@ Resources:
   GoProducerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/producer/
+      CodeUri: . # <--- CHANGE THIS to a single dot
       Handler: bootstrap
       Runtime: provided.al2023
       Architectures: [arm64]
@@ -94,13 +94,14 @@ Resources:
         DailyTrigger:
           Type: ScheduleV2
           Properties:
-            # Runs Mon-Fri at 4:15 PM EST (21:15 UTC)
             ScheduleExpression: "cron(15 21 ? * MON-FRI *)"
+    Metadata:
+      BuildMethod: makefile # <--- ADD THIS
 
   GoWorkerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/worker/
+      CodeUri: . # <--- CHANGE THIS to a single dot
       Handler: bootstrap
       Runtime: provided.al2023
       Architectures: [arm64]
@@ -121,11 +122,13 @@ Resources:
           Properties:
             Queue: !GetAtt ProcessingQueue.Arn
             BatchSize: 1
+    Metadata:
+      BuildMethod: makefile # <--- ADD THIS
 
   GoApiFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/api/
+      CodeUri: . # <--- CHANGE THIS to a single dot
       Handler: bootstrap
       Runtime: provided.al2023
       Architectures: [arm64]
@@ -141,6 +144,8 @@ Resources:
           Properties:
             Path: /rankings
             Method: get
+    Metadata:
+      BuildMethod: makefile # <--- ADD THIS
 
 Outputs:
   RankingsApiUrl:
