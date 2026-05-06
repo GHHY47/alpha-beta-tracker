@@ -96,7 +96,7 @@ Resources:
             # Runs Mon-Fri at 4:15 PM EST (21:15 UTC)
             ScheduleExpression: "cron(15 21 ? * MON-FRI *)"
     Metadata:
-      BuildMethod: go
+      BuildMethod: go1.x
 
   GoWorkerFunction:
     Type: AWS::Serverless::Function
@@ -106,14 +106,14 @@ Resources:
       Runtime: provided.al2023
       Architectures: [arm64]
       Timeout: 900
-      Environment:
-        Variables:
-          DB_HOST: "alphabeta-db.c9o4cmack332.us-east-2.rds.amazonaws.com"
-          DB_USER: "postgres"
-          DB_PASS: "localpassword"
-          DB_NAME: "alphabeta"
-          TWELVE_DATA_API_KEY: "0854987a076c4fdab6f99bc6311c2eee"
-      Policies:
+    Environment:
+      Variables:
+        DB_HOST: "alphabeta-db.c9o4cmack332.us-east-2.rds.amazonaws.com"
+        DB_USER: "postgres"
+        DB_PASS: "{{resolve:ssm-secure:/alphabeta/db-password}}"
+        DB_NAME: "alphabeta"
+        TWELVE_DATA_API_KEY: "{{resolve:ssm-secure:/alphabeta/twelve-data-api-key}}"  # only on GoWorkerFunction
+          Policies:
         - SQSPollerPolicy:
             QueueName: !GetAtt ProcessingQueue.QueueName
       Events:
@@ -123,7 +123,7 @@ Resources:
             Queue: !GetAtt ProcessingQueue.Arn
             BatchSize: 1 
     Metadata:
-      BuildMethod: go
+      BuildMethod: go1.x
 
   GoApiFunction:
     Type: AWS::Serverless::Function
@@ -145,7 +145,7 @@ Resources:
             Path: /rankings
             Method: get
     Metadata:
-      BuildMethod: go
+      BuildMethod: go1.x
 
 Outputs:
   RankingsApiUrl:
