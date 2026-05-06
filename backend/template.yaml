@@ -58,6 +58,7 @@ Resources:
 
   AlphaBetaTable:
     Type: AWS::DynamoDB::Table
+  
     Properties:
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
@@ -95,8 +96,6 @@ Resources:
           Properties:
             # Runs Mon-Fri at 4:15 PM EST (21:15 UTC)
             ScheduleExpression: "cron(15 21 ? * MON-FRI *)"
-    Metadata:
-      BuildMethod: go1.x
 
   GoWorkerFunction:
     Type: AWS::Serverless::Function
@@ -122,8 +121,6 @@ Resources:
           Properties:
             Queue: !GetAtt ProcessingQueue.Arn
             BatchSize: 1
-    Metadata:
-      BuildMethod: go1.x
 
   GoApiFunction:
     Type: AWS::Serverless::Function
@@ -144,8 +141,6 @@ Resources:
           Properties:
             Path: /rankings
             Method: get
-    Metadata:
-      BuildMethod: go1.x
 
 Outputs:
   RankingsApiUrl:
