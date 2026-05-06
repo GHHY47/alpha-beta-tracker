@@ -86,6 +86,9 @@ Resources:
       Handler: bootstrap
       Runtime: provided.al2023
       Architectures: [arm64]
+      Environment:
+        Variables:
+          SQS_QUEUE_URL: !Ref ProcessingQueue
       Policies:
         - SQSSendMessagePolicy:
             QueueName: !GetAtt ProcessingQueue.QueueName
@@ -93,7 +96,7 @@ Resources:
         DailyTrigger:
           Type: ScheduleV2
           Properties:
-            ScheduleExpression: "cron(15 21 ? * MON-FRI *)"
+            ScheduleExpression: "cron(00 22 ? * MON-FRI *)"
     Metadata:
       BuildMethod: makefile
 

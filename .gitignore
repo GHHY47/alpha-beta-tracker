@@ -17,5 +17,6 @@ __pycache__/
 env.json
 
 # text for LLM prompts
+project_context/
 project_context.txt
 run.sh
