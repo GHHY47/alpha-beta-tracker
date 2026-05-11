@@ -1,5 +1,7 @@
 ALPHA BETA TRACKER
 
+🚀 Live Demo: [Click Here -> ] (https://d1nvuss31rrore.cloudfront.net/)
+
 An end-to-end quantitative financial analytics platform designed to calculate, visualize, and analyze Capital Asset Pricing Model (CAPM) metrics (Alpha and Beta) for equities. 
 
 This platform was engineered to showcase a transition of rigorous problem-solving skills from complex hardware product integration into the software domain. It emphasizes clean code, scalable cloud infrastructure, and the seamless fusion of quantitative math with modern web technologies.
